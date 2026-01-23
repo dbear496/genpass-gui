@@ -2,7 +2,7 @@
 # src/CMakeLists.txt
 # This file is part of GenPass-GUI.
 #
-# Copyright (C) 2025       David Bears <dbear4q@gmail.com>
+# Copyright (C) 2025-2026 David Bears <dbear4q@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,10 +19,14 @@
 # ---------------------------------------------------------------------- */
 
 add_executable(genpass-gui
-
+  GenpassWindow.cpp
+  GenpassWindow.hpp
+  GenpassWindow.ui
+  main.cpp
 )
 
-target_link_libraries(genpass
+target_link_libraries(genpass-gui
   PRIVATE
-  QT::Widgets
+  Qt6::Widgets
+  genpass::genpass
 )
