@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------- *\
- * src/GenpassWindow.hpp
+ * src/PasswordListModel.hpp
  * This file is part of GenPass-GUI.
  *
  * Copyright (C) 2026      David Bears <dbear4q@gmail.com>
@@ -18,23 +18,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 \* ---------------------------------------------------------------------- */
 
-#include <QMainWindow>
+#include <QAbstractListModel>
 #include <genpass/Genpass.hpp>
 
-#include "PasswordListModel.hpp"
-
-namespace Ui {
-  class GenpassWindow;
-}
-
-class GenpassWindow : public QMainWindow {
+class PasswordListModel : public QAbstractListModel {
 public:
-  GenpassWindow(genpass::Genpass& genpass);
-  virtual ~GenpassWindow();
+  PasswordListModel(genpass::Genpass& genpass);
+  virtual ~PasswordListModel();
+
+  virtual int rowCount(const QModelIndex& parent) const override;
+  virtual int columnCount(const QModelIndex& parent) const override;
+  virtual QVariant data(const QModelIndex& index, int role) const override;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+
+  virtual QVariant headerData(int section, Qt::Orientation orientation,
+    int role) const override;
+
+  void refresh();
+
+  void idAdded(const std::string& id);
+  void idRemoved(const std::string& id);
 
 private:
   genpass::Genpass& genpass;
-  PasswordListModel pwListModel;
+  std::vector<std::string> ids;
 
-  const std::unique_ptr<Ui::GenpassWindow> ui;
+  bool indexValid(const QModelIndex& index) const;
 };

@@ -23,10 +23,13 @@
 
 #include <genpass/Genpass.hpp>
 
-GenpassWindow::GenpassWindow(genpass::Genpass& genpass)
-  : QMainWindow(), genpass(genpass), ui(new Ui::GenpassWindow())
+GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
+  QMainWindow(), genpass(genpass), pwListModel(genpass),
+  ui(new Ui::GenpassWindow())
 {
   ui->setupUi(this);
+
+  ui->idList->setModel(&pwListModel);
 }
 
 GenpassWindow::~GenpassWindow() { }
