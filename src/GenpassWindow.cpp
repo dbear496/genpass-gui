@@ -22,6 +22,7 @@
 #include "ui_GenpassWindow.h"
 
 #include <genpass/Genpass.hpp>
+#include <QStyleHints>
 
 GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
   QMainWindow(), genpass(genpass), pwListModel(genpass),
@@ -30,6 +31,55 @@ GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
   ui->setupUi(this);
 
   ui->idList->setModel(&pwListModel);
+  QObject::connect(
+    ui->idList->selectionModel(), &QItemSelectionModel::selectionChanged,
+    this, &GenpassWindow::updateCurrentPw
+  );
+
+  QStringList algos;
+  for(auto it = genpass.algorithms_begin();
+    it != genpass.algorithms_end(); ++it
+  ) {
+    algos.push_back(it->c_str());
+  }
+  algos.sort();
+  ui->selectAlgo->addItems(algos);
+
+  const QChar pwMaskChar = qApp->styleHints()->passwordMaskCharacter();
+  ui->password->setPlaceholderText(QString(pwMaskChar).repeated(16));
+
+  updateCurrentPw();
 }
 
 GenpassWindow::~GenpassWindow() { }
+
+void
+GenpassWindow::updateCurrentPw() {
+  QModelIndexList selection =
+    ui->idList->selectionModel()->selection().indexes();
+  if(selection.empty())
+    currentPw = nullptr;
+  else {
+    const std::string& id = pwListModel.get(selection[0]);
+    currentPw = genpass.getPasswordPtr(id);
+  }
+
+  if(!currentPw) editMode = false;
+
+  ui->id->setText(currentPw ? currentPw->id.c_str() : "");
+  ui->id->setEnabled(currentPw);
+  ui->id->setReadOnly(!editMode);
+
+  ui->spinSerial->setValue(currentPw ? currentPw->serial : 0);
+  ui->spinSerial->setEnabled(editMode);
+
+  std::string algorithm = currentPw ? currentPw->algorithmName() : "";
+  ui->selectAlgo->setCurrentText(algorithm);
+  ui->selectAlgo->setEnabled(editMode);
+
+  ui->password->setText("");
+
+  ui->note->setPlainText(currentPw ? currentPw->note.c_str() : "");
+
+
+}

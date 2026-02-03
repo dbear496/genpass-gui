@@ -45,7 +45,7 @@ PasswordListModel::refresh() {
   auto idIt = ids.cbegin();
   auto addIt = addList.cbegin();
   while(idIt != ids.cend()) {
-    if(!genpass.getPasswordOpt(*idIt)) {
+    if(!genpass.getPasswordPtr(*idIt)) {
       ++idIt;
       continue;
     }
@@ -139,6 +139,11 @@ PasswordListModel::data(const QModelIndex& index, int role) const {
     return QVariant();
 
   return QString(ids[index.row()].c_str());
+}
+
+const std::string&
+PasswordListModel::get(const QModelIndex& index) const {
+  return ids.at(index.row());
 }
 
 Qt::ItemFlags

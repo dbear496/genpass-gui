@@ -32,9 +32,14 @@ public:
   GenpassWindow(genpass::Genpass& genpass);
   virtual ~GenpassWindow();
 
+  void updateCurrentPw();
+
 private:
   genpass::Genpass& genpass;
+  genpass::Password *currentPw = nullptr;
   PasswordListModel pwListModel;
+
+  bool editMode = false;
 
   const std::unique_ptr<Ui::GenpassWindow> ui;
 };

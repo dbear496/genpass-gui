@@ -32,7 +32,6 @@ main(int argc, char **argv) {
   genpass::Genpass genpass;
   addTestPasswords(genpass);
 
-
   GenpassWindow mainWindow(genpass);
 
   mainWindow.show();
