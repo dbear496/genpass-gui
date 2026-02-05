@@ -25,6 +25,9 @@ add_executable(genpass-gui
   main.cpp
   PasswordListModel.cpp
   PasswordListModel.hpp
+  PasswordPropsWidget.cpp
+  PasswordPropsWidget.hpp
+  PasswordPropsWidget.ui
 )
 
 target_link_libraries(genpass-gui

@@ -24,6 +24,8 @@
 #include <genpass/Genpass.hpp>
 #include <QStyleHints>
 
+#include "PasswordPropsWidget.hpp"
+
 GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
   QMainWindow(), genpass(genpass), pwListModel(genpass),
   ui(new Ui::GenpassWindow())
@@ -33,53 +35,27 @@ GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
   ui->idList->setModel(&pwListModel);
   QObject::connect(
     ui->idList->selectionModel(), &QItemSelectionModel::selectionChanged,
-    this, &GenpassWindow::updateCurrentPw
+    this, &GenpassWindow::updatePasswordSelection
   );
 
-  QStringList algos;
-  for(auto it = genpass.algorithms_begin();
-    it != genpass.algorithms_end(); ++it
-  ) {
-    algos.push_back(it->c_str());
-  }
-  algos.sort();
-  ui->selectAlgo->addItems(algos);
-
-  const QChar pwMaskChar = qApp->styleHints()->passwordMaskCharacter();
-  ui->password->setPlaceholderText(QString(pwMaskChar).repeated(16));
-
-  updateCurrentPw();
+  pwProps = new PasswordPropsWidget(genpass);
+  ui->passwordPropsArea->setWidget(pwProps);
 }
 
 GenpassWindow::~GenpassWindow() { }
 
 void
-GenpassWindow::updateCurrentPw() {
-  QModelIndexList selection =
-    ui->idList->selectionModel()->selection().indexes();
+GenpassWindow::updatePasswordSelection(
+  const QItemSelection &newSelection,
+  const QItemSelection &oldSelection
+) {
+  QModelIndexList selection = newSelection.indexes();
+  genpass::Password *selectedPw;
   if(selection.empty())
-    currentPw = nullptr;
+    selectedPw = nullptr;
   else {
     const std::string& id = pwListModel.get(selection[0]);
-    currentPw = genpass.getPasswordPtr(id);
+    selectedPw = genpass.getPasswordPtr(id);
   }
-
-  if(!currentPw) editMode = false;
-
-  ui->id->setText(currentPw ? currentPw->id.c_str() : "");
-  ui->id->setEnabled(currentPw);
-  ui->id->setReadOnly(!editMode);
-
-  ui->spinSerial->setValue(currentPw ? currentPw->serial : 0);
-  ui->spinSerial->setEnabled(editMode);
-
-  std::string algorithm = currentPw ? currentPw->algorithmName() : "";
-  ui->selectAlgo->setCurrentText(algorithm);
-  ui->selectAlgo->setEnabled(editMode);
-
-  ui->password->setText("");
-
-  ui->note->setPlainText(currentPw ? currentPw->note.c_str() : "");
-
-
+  pwProps->setPassword(selectedPw);
 }

@@ -18,6 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 \* ---------------------------------------------------------------------- */
 
+#ifndef __GENPASSGUI_PASSWORDLISTMODEL_HPP__
+#define __GENPASSGUI_PASSWORDLISTMODEL_HPP__
+
 #include <QAbstractListModel>
 #include <genpass/Genpass.hpp>
 
@@ -46,3 +49,5 @@ private:
 
   bool indexValid(const QModelIndex& index) const;
 };
+
+#endif // __GENPASSGUI_PASSWORDLISTMODEL_HPP__
