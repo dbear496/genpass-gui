@@ -22,6 +22,7 @@
 #include <genpass/Genpass.hpp>
 
 #include "GenpassWindow.hpp"
+#include "V2AlgorithmHandler.hpp"
 
 static void addTestPasswords(genpass::Genpass& genpass);
 
@@ -31,6 +32,8 @@ main(int argc, char **argv) {
 
   genpass::Genpass genpass;
   addTestPasswords(genpass);
+
+  V2AlgorithmHandler v2AlgorithmHandler;
 
   GenpassWindow mainWindow(genpass);
 

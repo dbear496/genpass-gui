@@ -57,5 +57,6 @@ GenpassWindow::updatePasswordSelection(
     const std::string& id = pwListModel.get(selection[0]);
     selectedPw = genpass.getPasswordPtr(id);
   }
+  pwProps->setEditing(false);
   pwProps->setPassword(selectedPw);
 }

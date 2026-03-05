@@ -26,6 +26,7 @@
 #include <QStyleHints>
 
 #include "GenpassWindow.hpp"
+#include "AlgorithmHandler.hpp"
 
 PasswordPropsWidget::PasswordPropsWidget(genpass::Genpass& genpass) :
   QWidget(), genpass(genpass), ui(new Ui::PasswordPropsWidget())
@@ -40,6 +41,10 @@ PasswordPropsWidget::PasswordPropsWidget(genpass::Genpass& genpass) :
   }
   algos.sort();
   ui->selectAlgo->addItems(algos);
+  QObject::connect(
+    ui->selectAlgo, &QComboBox::currentTextChanged,
+    this, &PasswordPropsWidget::changeAlgorithmQ
+  );
 
   const QChar pwMaskChar = qApp->styleHints()->passwordMaskCharacter();
   ui->password->setPlaceholderText(QString(pwMaskChar).repeated(16));
@@ -50,25 +55,21 @@ PasswordPropsWidget::~PasswordPropsWidget() { }
 void
 PasswordPropsWidget::setPassword(genpass::Password *pw) {
   if(pw == currentPw) return;
+  if(editMode) commitEdits(); // TODO: handle invalid state
   currentPw = pw;
-  if(!currentPw) setEditing(false);
 
   ui->id->setText(currentPw ? currentPw->id.c_str() : "");
-  ui->id->setEnabled(currentPw);
-  ui->id->setReadOnly(!editMode);
+  ui->id->setEnabled(currentPw || editMode);
 
   ui->spinSerial->setValue(currentPw ? currentPw->serial : 0);
-  ui->spinSerial->setEnabled(editMode);
 
   std::string algorithm = currentPw ? currentPw->algorithmName() : "";
   ui->selectAlgo->setCurrentText(algorithm.c_str());
-  ui->selectAlgo->setEnabled(editMode);
 
   ui->password->setText("");
 
   ui->note->setPlainText(currentPw ? currentPw->note.c_str() : "");
-  ui->note->setEnabled(currentPw);
-  ui->note->setReadOnly(!editMode);
+  ui->note->setEnabled(currentPw || editMode);
 
   passwordChanged(currentPw);
 }
@@ -76,7 +77,70 @@ PasswordPropsWidget::setPassword(genpass::Password *pw) {
 void
 PasswordPropsWidget::setEditing(bool edit) {
   if(edit == editMode) return;
+  if(editMode) commitEdits(); // TODO: handle invalid state
   editMode = edit;
 
+  ui->id->setReadOnly(!editMode);
+  ui->spinSerial->setEnabled(editMode);
+  ui->selectAlgo->setEnabled(editMode);
+  ui->note->setReadOnly(!editMode);
+
+  algorithmProps->setEditing(editMode);
+
   editModeChanged(editMode);
+}
+
+void
+PasswordPropsWidget::commitEdits() {
+  std::string id = ui->id->text().toStdString();
+  std::string algo = ui->selectAlgo->currentText().toStdString();
+
+  if(!currentPw || algo != currentPw->algorithmName()) {
+    if(currentPw) genpass.removePassword(currentPw->id);
+    try { currentPw = &genpass.newPassword(algo, id); }
+    catch (const std::runtime_error&) { throw; } // TODO
+  }
+
+  std::string oldId = currentPw->id;
+  currentPw->id = id;
+  if(id != oldId) {
+    genpass.updateId(oldId);
+  }
+
+  currentPw->serial = ui->spinSerial->value();
+  currentPw->note = ui->note->toPlainText().toStdString();
+
+  algorithmProps->commitEdits(*currentPw);
+
+  editsCommitted();
+}
+
+void
+PasswordPropsWidget::changeAlgorithm(const std::string& name) {
+  const AlgorithmHandler *handler = AlgorithmHandler::getAlgorithm(name);
+
+  QFormLayout * const layout = static_cast<QFormLayout *>(this->layout());
+
+  // remove widgets for old algorithm
+  if(algorithmProps)
+  for(const auto& w : algorithmProps->getWidgets()) {
+    auto row = layout->takeRow(w.second);
+    delete row.fieldItem;
+    if(row.labelItem)
+      delete row.labelItem->widget();
+    delete row.labelItem;
+  }
+
+  if(!handler) {
+    algorithmProps = nullptr;
+    return;
+  }
+  algorithmProps = handler->createProps(*this);
+
+  // add widgets for new algorithm
+  int row;
+  layout->getWidgetPosition(ui->selectAlgo, &row, nullptr);
+  for(const auto& w : algorithmProps->getWidgets()) {
+    layout->insertRow(++row, (w.first + ":").c_str(), w.second);
+  }
 }

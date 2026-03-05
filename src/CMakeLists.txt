@@ -19,6 +19,8 @@
 # ---------------------------------------------------------------------- */
 
 add_executable(genpass-gui
+  AlgorithmHandler.cpp
+  AlgorithmHandler.hpp
   GenpassWindow.cpp
   GenpassWindow.hpp
   GenpassWindow.ui
@@ -28,6 +30,8 @@ add_executable(genpass-gui
   PasswordPropsWidget.cpp
   PasswordPropsWidget.hpp
   PasswordPropsWidget.ui
+  V2AlgorithmHandler.cpp
+  V2AlgorithmHandler.hpp
 )
 
 target_link_libraries(genpass-gui

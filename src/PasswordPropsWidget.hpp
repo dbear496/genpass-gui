@@ -24,6 +24,7 @@
 #include <QWidget>
 #include <genpass/Password.hpp>
 
+class AlgorithmProps;
 namespace genpass { class Genpass; }
 namespace Ui {
   class PasswordPropsWidget;
@@ -51,17 +52,26 @@ public:
 
   bool isEditing() const { return editMode; }
   void setEditing(bool);
+  void commitEdits();
 
-signals:
+Q_SIGNALS:
   void editModeChanged(bool);
-  void passwordChanged(genpass::Password *);
-  void passwordEdited();
+  void passwordChanged(genpass::Password *newPw);
+  void propertyEdited(); // user has touched a property in the gui
+  void editsCommitted(); // edits from gui written to the backend
 
 private:
   genpass::Genpass& genpass;
   genpass::Password *currentPw = nullptr;
   bool editMode = false;
+  std::unique_ptr<AlgorithmProps> algorithmProps;
+
   const std::unique_ptr<Ui::PasswordPropsWidget> ui;
+
+  void changeAlgorithm(const std::string& name);
+  void changeAlgorithmQ(const QString& name) {
+    changeAlgorithm(name.toStdString());
+  }
 };
 
 #endif // __GENPASSGUI_PASSWORDPROPSWIDGET_HPP__

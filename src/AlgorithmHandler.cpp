@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------- *\
- * src/GenpassWindow.hpp
+ * src/AlgorithmHandler.cpp
  * This file is part of GenPass-GUI.
  *
  * Copyright (C) 2026      David Bears <dbear4q@gmail.com>
@@ -18,41 +18,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 \* ---------------------------------------------------------------------- */
 
-#ifndef __GENPASSGUI_GENPASSWINDOW_HPP__
-#define __GENPASSGUI_GENPASSWINDOW_HPP__
+#include "AlgorithmHandler.hpp"
 
-#include <genpass/Genpass.hpp>
-#include <QItemSelection>
-#include <QMainWindow>
+decltype(AlgorithmHandler::algorithms) AlgorithmHandler::algorithms;
 
-#include "PasswordListModel.hpp"
-#include "PasswordPropsWidget.hpp"
-
-class AlgorithmProps;
-class PasswordPropsWidget;
-namespace Ui {
-  class GenpassWindow;
+AlgorithmHandler::AlgorithmHandler(const std::string& algorithm) :
+  algorithm(algorithm)
+{
+  if(!AlgorithmHandler::algorithms.insert({algorithm, this}).second)
+    throw std::runtime_error("this algorithm handler already exists");
 }
 
-class GenpassWindow : public QMainWindow {
-  Q_OBJECT
+AlgorithmHandler::~AlgorithmHandler() {
+  auto regIt = AlgorithmHandler::algorithms.find(algorithm);
+  if(regIt == AlgorithmHandler::algorithms.end() || regIt->second != this)
+    assert(!"deleting unregistered algorithm handler");
+  AlgorithmHandler::algorithms.erase(regIt);
+}
 
-public:
-  GenpassWindow(genpass::Genpass& genpass);
-  virtual ~GenpassWindow();
-
-private:
-  void updatePasswordSelection(
-    const QItemSelection &newSelection,
-    const QItemSelection &oldSelection
-  );
-
-  genpass::Genpass& genpass;
-
-  PasswordListModel pwListModel;
-  PasswordPropsWidget *pwProps;
-
-  const std::unique_ptr<Ui::GenpassWindow> ui;
-};
-
-#endif // __GENPASSGUI_GENPASSWINDOW_HPP__
+const AlgorithmHandler *
+AlgorithmHandler::getAlgorithm(const std::string& algorithm) {
+  auto algIt = AlgorithmHandler::algorithms.find(algorithm);
+  if(algIt == AlgorithmHandler::algorithms.end()) return nullptr;
+  else return algIt->second;
+}
