@@ -52,29 +52,29 @@ set(GENPASSGUI_CXX_FLAGS_BETATEST       -O3 -g -w)
 set(GENPASSGUI_CXX_FLAGS_DEBUG          -O0 -g -DDEBUG)
 set(GENPASSGUI_CXX_FLAGS_DEBUGOPT       -O2 -g -DDEBUG)
 foreach(BType ${BUILD_TYPES})
-	string(TOUPPER ${BType} BTYPE)
-	set(GENPASSGUI_CXX_FLAGS_${BTYPE} ${GENPASSGUI_CXX_FLAGS_${BTYPE}}
-		CACHE STRING "Flags used by the CXX compiler for ${BTYPE} builds.")
-	set(GENPASSGUI_C_FLAGS_${BCONFIG} ${GENPASSGUI_CXX_FLAGS_${BTYPE}}
-		CACHE STRING "Flags used by the C compiler for ${BTYPE} builds.")
+  string(TOUPPER ${BType} BTYPE)
+  set(GENPASSGUI_CXX_FLAGS_${BTYPE} ${GENPASSGUI_CXX_FLAGS_${BTYPE}}
+    CACHE STRING "Flags used by the CXX compiler for ${BTYPE} builds.")
+  set(GENPASSGUI_C_FLAGS_${BCONFIG} ${GENPASSGUI_CXX_FLAGS_${BTYPE}}
+    CACHE STRING "Flags used by the C compiler for ${BTYPE} builds.")
 endforeach()
 add_compile_options(${GENPASSGUI_CXX_FLAGS_${BUILD_TYPE_UPPER}})
 
 
 ### compute version
 set(GENPASSGUI_VERSION_SUFFIX "" CACHE STRING
-	"Custom version suffix to use; mostly useful for downstream packaging."
+  "Custom version suffix to use; mostly useful for downstream packaging."
 )
 include(GetGitRevisionDescription)
 if(DEFINED GENPASSGUI_VERSION_SUFFIX AND NOT (GENPASSGUI_VERSION_SUFFIX STREQUAL ""))
-	set(FULL_PROJECT_VERSION "${PROJECT_VERSION}-${GENPASSGUI_VERSION_SUFFIX}")
+  set(FULL_PROJECT_VERSION "${PROJECT_VERSION}-${GENPASSGUI_VERSION_SUFFIX}")
 else()
-	git_describe_working_tree(FULL_PROJECT_VERSION --match genpass-gui-*)
-	if(FULL_PROJECT_VERSION)
-		string(SUBSTRING ${FULL_PROJECT_VERSION} 8 -1 FULL_PROJECT_VERSION)
-	else()
-		set(FULL_PROJECT_VERSION "${PROJECT_VERSION}-unknown")
-	endif()
+  git_describe_working_tree(FULL_PROJECT_VERSION --match genpass-gui-*)
+  if(FULL_PROJECT_VERSION)
+    string(SUBSTRING ${FULL_PROJECT_VERSION} 8 -1 FULL_PROJECT_VERSION)
+  else()
+    set(FULL_PROJECT_VERSION "${PROJECT_VERSION}-unknown")
+  endif()
 endif()
 set(VERSION_RELEASE "")
 set(VERSION_MINSIZEREL "")
@@ -83,9 +83,9 @@ set(VERSION_BETATEST "beta")
 set(VERSION_DEBUG "debug")
 set(VERSION_DEBUGOPT "debug")
 if(VERSION_${BUILD_TYPE_UPPER})
-	set(FULL_PROJECT_VERSION ${FULL_PROJECT_VERSION}-${VERSION_${BUILD_TYPE_UPPER}})
+  set(FULL_PROJECT_VERSION ${FULL_PROJECT_VERSION}-${VERSION_${BUILD_TYPE_UPPER}})
 elseif(NOT DEFINED VERSION_${BUILD_TYPE_UPPER})
-	message(WARNING "unrecognized build type: ${BUILD_TYPE_UPPER}")
+  message(WARNING "unrecognized build type: ${BUILD_TYPE_UPPER}")
 endif()
 message(STATUS "${PROJECT_NAME_PRETTY} version: ${FULL_PROJECT_VERSION}")
 
@@ -101,13 +101,17 @@ include(GNUInstallDirs)
 ### include what you use
 find_program(INCLUDE_WHAT_YOU_USE NAMES include-what-you-use)
 if(NOT CMAKE_CROSSCOMPILING AND INCLUDE_WHAT_YOU_USE AND
-	NOT GENPASSGUI_CXX_FLAGS_${BUILD_TYPE_UPPER} MATCHES "(^| )-w( |$)"
+  NOT GENPASSGUI_CXX_FLAGS_${BUILD_TYPE_UPPER} MATCHES "(^| )-w( |$)"
 )
-	set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${INCLUDE_WHAT_YOU_USE}
-    -w -Xiwyu --mapping_file=${CMAKE_SOURCE_DIR}/mk/iwyu.map
+  set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${INCLUDE_WHAT_YOU_USE} -w
+    -Xiwyu --mapping_file=${CMAKE_SOURCE_DIR}/mk/iwyu/c++.iwyu
+    -Xiwyu --mapping_file=${CMAKE_SOURCE_DIR}/mk/iwyu/qt6.iwyu
     ${GENPASS_INCLUDE_WHAT_YOU_USE}
   )
-	set(CMAKE_C_INCLUDE_WHAT_YOU_USE ${CMAKE_CXX_INCLUDE_WHAT_YOU_USE})
+  set(CMAKE_C_INCLUDE_WHAT_YOU_USE ${INCLUDE_WHAT_YOU_USE} -w
+    -Xiwyu --mapping_file=${CMAKE_SOURCE_DIR}/mk/iwyu/c.iwyu
+    ${GENPASS_INCLUDE_WHAT_YOU_USE}
+  )
 endif()
 
 
@@ -123,7 +127,7 @@ add_subdirectory(src)
 ### packaging
 set(CPACK_GENERATOR TXZ)
 if(WIN32)
-	set(CPACK_GENERATOR ZIP)
+  set(CPACK_GENERATOR ZIP)
 endif()
 set(CPACK_SOURCE_GENERATOR ${CPACK_GENERATOR})
 # set(CPACK_PACKAGE_ICON )
@@ -136,8 +140,8 @@ set(CPACK_SOURCE_IGNORE_FILES
 )
 set(CPACK_PACKAGE_VERSION ${FULL_PROJECT_VERSION})
 if(GENPASSGUI_CXX_FLAGS_${BUILD_TYPE_UPPER} MATCHES "(^| )-g( |$)")
-	set(CPACK_STRIP_FILES FALSE)
+  set(CPACK_STRIP_FILES FALSE)
 else()
-	set(CPACK_STRIP_FILES TRUE)
+  set(CPACK_STRIP_FILES TRUE)
 endif()
 include(CPack)
