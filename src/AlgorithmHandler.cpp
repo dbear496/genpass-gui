@@ -20,6 +20,9 @@
 
 #include "AlgorithmHandler.hpp"
 
+#include <cassert>    // for assert
+#include <stdexcept>  // for runtime_error
+
 decltype(AlgorithmHandler::algorithms) AlgorithmHandler::algorithms;
 
 AlgorithmHandler::AlgorithmHandler(const std::string& algorithm) :

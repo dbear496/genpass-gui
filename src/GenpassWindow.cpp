@@ -19,12 +19,22 @@
 \* ---------------------------------------------------------------------- */
 
 #include "GenpassWindow.hpp"
-#include "ui_GenpassWindow.h"
 
-#include <genpass/Genpass.hpp>
-#include <QStyleHints>
+// IWYU pragma: no_include <QtCore>
+#include <genpass/Genpass.hpp>      // for Genpass
+#include <QItemSelection>           // for QItemSelection
+#include <QItemSelectionModel>      // for QItemSelectionModel
+#include <QListView>                // for QListView
+#include <QModelIndexList>          // for QModelIndexList, QTypeInfo<>::isR...
+#include <QScrollArea>              // for QScrollArea
+#include <string>                   // for string
 
-#include "PasswordPropsWidget.hpp"
+#include "PasswordPropsWidget.hpp"  // for PasswordPropsWidget
+#include "ui_GenpassWindow.h"       // for GenpassWindow
+
+namespace genpass {
+class Password;
+}  // namespace genpass
 
 GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
   QMainWindow(), genpass(genpass), pwListModel(genpass),

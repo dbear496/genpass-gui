@@ -19,14 +19,26 @@
 \* ---------------------------------------------------------------------- */
 
 #include "PasswordPropsWidget.hpp"
-#include "ui_PasswordPropsWidget.h"
 
-#include <genpass/Genpass.hpp>
-#include <genpass/Password.hpp>
-#include <QStyleHints>
+#include <genpass/Genpass.hpp>       // for Genpass, operator==
+#include <genpass/Password.hpp>      // for Password
+#include <QApplication>              // for QApplication, qApp
+#include <QChar>                     // for QChar
+#include <QComboBox>                 // for QComboBox
+#include <QFormLayout>               // for QFormLayout
+#include <QLayoutItem>               // for QLayoutItem
+#include <QLineEdit>                 // for QLineEdit
+#include <QList>                     // for QList
+#include <QPlainTextEdit>            // for QPlainTextEdit
+#include <QSpinBox>                  // for QSpinBox
+#include <QStringList>               // for QStringList
+#include <QStyleHints>               // for QStyleHints
+#include <stdexcept>                 // for runtime_error
+#include <utility>                   // for pair
+#include <vector>                    // for vector
 
-#include "GenpassWindow.hpp"
-#include "AlgorithmHandler.hpp"
+#include "AlgorithmHandler.hpp"      // for AlgorithmProps, AlgorithmHandler
+#include "ui_PasswordPropsWidget.h"  // for PasswordPropsWidget
 
 PasswordPropsWidget::PasswordPropsWidget(genpass::Genpass& genpass) :
   QWidget(), genpass(genpass), ui(new Ui::PasswordPropsWidget())

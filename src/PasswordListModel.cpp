@@ -20,6 +20,18 @@
 
 #include "PasswordListModel.hpp"
 
+// IWYU pragma: no_include <QtCore>
+#include <genpass/Genpass.hpp>   // for Genpass, operator==
+#include <genpass/Password.hpp>  // for Password
+#include <QFlags>                // for QFlags
+#include <QModelIndex>           // for QModelIndex
+#include <QModelIndexList>       // for QModelIndexList
+#include <QString>               // for QString
+#include <QVariant>              // for QVariant
+#include <algorithm>             // for lower_bound, binary_search, sort
+#include <compare>               // for operator<
+#include <cstddef>               // for size_t
+
 PasswordListModel::PasswordListModel(genpass::Genpass& genpass)
   : genpass(genpass)
 {

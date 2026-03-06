@@ -21,14 +21,13 @@
 #ifndef __GENPASSGUI_V2ALGORITHMHANDLER_HPP__
 #define __GENPASSGUI_V2ALGORITHMHANDLER_HPP__
 
-#include "AlgorithmHandler.hpp"
+#include <QLineEdit>             // for QLineEdit
+#include <QSpinBox>              // for QSpinBox
+#include <string>                // for string
 
-#include <QLineEdit>
-#include <QSpinBox>
+#include "AlgorithmHandler.hpp"  // for AlgorithmHandler, AlgorithmProps
 
-#include "PasswordPropsWidget.hpp"
-
-class AlgorithmProps;
+class PasswordPropsWidget;
 
 class V2AlgorithmHandler: public AlgorithmHandler {
 public:

@@ -21,11 +21,13 @@
 #ifndef __GENPASSGUI_ALGORITHMHANDLER_HPP__
 #define __GENPASSGUI_ALGORITHMHANDLER_HPP__
 
-#include <string>
-#include <genpass/Genpass.hpp>
-#include <stdexcept>
-#include <map>
-#include <QWidget>
+#include <genpass/Password.hpp>  // for Password
+#include <QWidget>               // for QWidget
+#include <map>                   // for map
+#include <memory>                // for unique_ptr
+#include <string>                // for string, basic_string
+#include <utility>               // for pair
+#include <vector>                // for vector
 
 class AlgorithmProps;
 class PasswordPropsWidget;

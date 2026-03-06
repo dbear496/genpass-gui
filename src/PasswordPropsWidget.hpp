@@ -21,11 +21,18 @@
 #ifndef __GENPASSGUI_PASSWORDPROPSWIDGET_HPP__
 #define __GENPASSGUI_PASSWORDPROPSWIDGET_HPP__
 
-#include <QWidget>
-#include <genpass/Password.hpp>
+#include <QObject>  // for Q_PROPERTY, Q_OBJECT, Q_SIGNALS
+#include <QString>  // for QString
+#include <QWidget>  // for QWidget
+#include <memory>   // for unique_ptr
+#include <string>   // for basic_string, string
 
 class AlgorithmProps;
-namespace genpass { class Genpass; }
+namespace genpass {
+class Genpass;
+class Password;
+}  // namespace genpass
+
 namespace Ui {
   class PasswordPropsWidget;
 }

@@ -20,7 +20,19 @@
 
 #include "V2AlgorithmHandler.hpp"
 
-#include <genpass/Password.hpp>
+#include <genpass/Password.hpp>         // for PasswordV2, Password
+#include <QChar>                        // for QChar
+#include <QObject>                      // for QObject
+#include <QRegularExpression>           // for QRegularExpression
+#include <QRegularExpressionValidator>  // for QRegularExpressionValidator
+#include <QString>                      // for QString
+#include <functional>                   // for less
+#include <memory>                       // for unique_ptr, make_unique
+#include <set>                          // for set, operator==
+#include <utility>                      // for pair
+#include <vector>                       // for vector
+
+#include "PasswordPropsWidget.hpp"      // for PasswordPropsWidget
 
 V2AlgorithmHandler::V2AlgorithmHandler() :
   V2AlgorithmHandler(genpass::PasswordV2::algName)

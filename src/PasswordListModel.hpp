@@ -21,8 +21,14 @@
 #ifndef __GENPASSGUI_PASSWORDLISTMODEL_HPP__
 #define __GENPASSGUI_PASSWORDLISTMODEL_HPP__
 
-#include <QAbstractListModel>
-#include <genpass/Genpass.hpp>
+#include <QAbstractListModel>  // for QAbstractListModel
+#include <Qt>                  // for ItemFlags, Orientation
+#include <string>              // for basic_string, string
+#include <vector>              // for vector
+
+namespace genpass {
+class Genpass;
+}  // namespace genpass
 
 class PasswordListModel : public QAbstractListModel {
 public:

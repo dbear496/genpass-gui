@@ -18,11 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 \* ---------------------------------------------------------------------- */
 
-#include <QApplication>
-#include <genpass/Genpass.hpp>
+#include <genpass/Genpass.hpp>     // for Genpass
+#include <QApplication>            // for QApplication
+#include <string>                  // for basic_string
 
-#include "GenpassWindow.hpp"
-#include "V2AlgorithmHandler.hpp"
+#include "GenpassWindow.hpp"       // for GenpassWindow
+#include "V2AlgorithmHandler.hpp"  // for V2AlgorithmHandler
 
 static void addTestPasswords(genpass::Genpass& genpass);
 
