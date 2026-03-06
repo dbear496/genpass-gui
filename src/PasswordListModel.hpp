@@ -22,6 +22,7 @@
 #define __GENPASSGUI_PASSWORDLISTMODEL_HPP__
 
 #include <QAbstractListModel>  // for QAbstractListModel
+#include <QModelIndex>         // for QModelIndex
 #include <Qt>                  // for ItemFlags, Orientation
 #include <string>              // for basic_string, string
 #include <vector>              // for vector
@@ -48,6 +49,8 @@ public:
 
   void idAdded(const std::string& id);
   void idRemoved(const std::string& id);
+
+  QModelIndex find(const std::string& id) const;
 
 private:
   genpass::Genpass& genpass;

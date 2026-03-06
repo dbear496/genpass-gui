@@ -60,7 +60,7 @@ V2AlgorithmProps::V2AlgorithmProps(
 {
   const int arbitraryMaximumLength = 99;
 
-  lengthWidget.setEnabled(false);
+  lengthWidget.setReadOnly(true);
   lengthWidget.setRange(0, arbitraryMaximumLength);
   QObject::connect(
     &lengthWidget, &QSpinBox::editingFinished,
@@ -90,15 +90,18 @@ V2AlgorithmProps::V2AlgorithmProps(
     &fillWidget, &QLineEdit::editingFinished,
     &parent, &PasswordPropsWidget::propertyEdited
   );
+
+  setPassword(parent.getPassword());
+  setEditing(parent.isEditing());
 }
 
 std::vector<std::pair<std::string, QWidget *>>
 V2AlgorithmProps::getWidgets() {
   return {
-    {"length", &lengthWidget},
-    {"postfix", &postfixWidget},
-    {"banned", &bannedCharsWidget},
-    {"fill", &fillWidget},
+    {"Length", &lengthWidget},
+    {"Postfix", &postfixWidget},
+    {"Banned", &bannedCharsWidget},
+    {"Fill", &fillWidget},
   };
 }
 
@@ -123,7 +126,7 @@ V2AlgorithmProps::setPassword(const genpass::Password *password) {
 
 void
 V2AlgorithmProps::setEditing(bool editing) {
-  lengthWidget.setEnabled(editing);
+  lengthWidget.setReadOnly(!editing);
   postfixWidget.setReadOnly(!editing);
   bannedCharsWidget.setReadOnly(!editing);
   fillWidget.setReadOnly(!editing);

@@ -52,7 +52,7 @@ class PasswordPropsWidget : public QWidget {
 
 public:
   PasswordPropsWidget(genpass::Genpass& genpass);
-  ~PasswordPropsWidget();
+  virtual ~PasswordPropsWidget();
 
   genpass::Password *getPassword() const { return currentPw; }
   void setPassword(genpass::Password *password);
@@ -60,6 +60,7 @@ public:
   bool isEditing() const { return editMode; }
   void setEditing(bool);
   void commitEdits();
+  void deletePassword();
 
 Q_SIGNALS:
   void editModeChanged(bool);
@@ -71,10 +72,12 @@ private:
   genpass::Genpass& genpass;
   genpass::Password *currentPw = nullptr;
   bool editMode = false;
+  bool editPending = false;
   std::unique_ptr<AlgorithmProps> algorithmProps;
 
   const std::unique_ptr<Ui::PasswordPropsWidget> ui;
 
+  void refreshPassword();
   void changeAlgorithm(const std::string& name);
   void changeAlgorithmQ(const QString& name) {
     changeAlgorithm(name.toStdString());

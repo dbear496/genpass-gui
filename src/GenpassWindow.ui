@@ -56,12 +56,18 @@
             <property name="text">
              <string>Create...</string>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="buttonEditPw">
             <property name="text">
              <string>Edit...</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -101,8 +107,8 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
-              <height>20</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -110,7 +116,7 @@
           <item>
            <widget class="QPushButton" name="buttonApply">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -120,6 +126,13 @@
             </property>
             <property name="text">
              <string>Apply</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonCancel">
+            <property name="text">
+             <string>Cancel</string>
             </property>
            </widget>
           </item>

@@ -184,3 +184,10 @@ PasswordListModel::headerData(
 
   return QVariant();
 }
+
+QModelIndex
+PasswordListModel::find(const std::string& id) const {
+  auto pos = std::lower_bound(ids.cbegin(), ids.cend(), id);
+  if(*pos == id) return index(pos - ids.cbegin(), 0);
+  else return QModelIndex();
+}

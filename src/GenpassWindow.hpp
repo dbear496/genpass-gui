@@ -30,6 +30,9 @@
 
 class PasswordPropsWidget;
 class QItemSelection;
+namespace genpass {
+class Password;
+}  // namespace genpass
 
 namespace Ui {
   class GenpassWindow;
@@ -43,10 +46,9 @@ public:
   virtual ~GenpassWindow();
 
 private:
-  void updatePasswordSelection(
-    const QItemSelection &newSelection,
-    const QItemSelection &oldSelection
-  );
+  void updatePasswordSelection(const QItemSelection &newSelection);
+  void updatePassword(genpass::Password *newPw);
+  void updateEditing(bool editing);
 
   genpass::Genpass& genpass;
 

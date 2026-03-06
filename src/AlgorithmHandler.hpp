@@ -54,6 +54,8 @@ private:
 
 class AlgorithmProps {
 public:
+  virtual ~AlgorithmProps() { }
+
   const AlgorithmHandler& getHandler() const { return handler; }
   const std::string& algorithmName() const { return handler.algorithmName(); }
 

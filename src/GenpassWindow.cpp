@@ -22,19 +22,20 @@
 
 // IWYU pragma: no_include <QtCore>
 #include <genpass/Genpass.hpp>      // for Genpass
+#include <genpass/Password.hpp>     // for Password
+#include <QAbstractButton>          // for QAbstractButton
 #include <QItemSelection>           // for QItemSelection
 #include <QItemSelectionModel>      // for QItemSelectionModel
 #include <QListView>                // for QListView
 #include <QModelIndexList>          // for QModelIndexList, QTypeInfo<>::isR...
+#include <QPushButton>              // for QPushButton
 #include <QScrollArea>              // for QScrollArea
-#include <string>                   // for string
+#include <QWidget>                  // for QWidget
+#include <functional>               // for bind
+#include <string>                   // for operator==, basic_string, string
 
 #include "PasswordPropsWidget.hpp"  // for PasswordPropsWidget
 #include "ui_GenpassWindow.h"       // for GenpassWindow
-
-namespace genpass {
-class Password;
-}  // namespace genpass
 
 GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
   QMainWindow(), genpass(genpass), pwListModel(genpass),
@@ -50,14 +51,63 @@ GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
 
   pwProps = new PasswordPropsWidget(genpass);
   ui->passwordPropsArea->setWidget(pwProps);
+  QObject::connect(
+    pwProps, &PasswordPropsWidget::passwordChanged,
+    this, &GenpassWindow::updatePassword
+  );
+  QObject::connect(
+    pwProps, &PasswordPropsWidget::editModeChanged,
+    this, &GenpassWindow::updateEditing
+  );
+  QObject::connect(
+    pwProps, &PasswordPropsWidget::editsCommitted,
+    this, std::bind(&PasswordListModel::refresh, &pwListModel)
+  );
+  QObject::connect(
+    pwProps, &PasswordPropsWidget::editsCommitted,
+    ui->buttonApply, std::bind(&QWidget::setEnabled, ui->buttonApply, false)
+  );
+  QObject::connect(
+    pwProps, &PasswordPropsWidget::propertyEdited,
+    ui->buttonApply, std::bind(&QWidget::setEnabled, ui->buttonApply, true)
+  );
+  QObject::connect(
+    ui->buttonApply, &QAbstractButton::clicked,
+    pwProps, [this](){
+      pwProps->commitEdits();
+      pwProps->setEditing(false);
+    }
+  );
+  QObject::connect(
+    ui->buttonCancel, &QAbstractButton::clicked,
+    pwProps, [this](){ pwProps->setEditing(false); }
+  );
+  QObject::connect(
+    ui->buttonEditPw, &QAbstractButton::clicked,
+    pwProps, &PasswordPropsWidget::setEditing
+  );
+  QObject::connect(
+    ui->buttonAddPw, &QAbstractButton::clicked,
+    pwProps, [this](bool checked){
+      if(checked)
+        pwProps->setPassword(nullptr);
+      pwProps->setEditing(checked);
+    }
+  );
+  QObject::connect(
+    ui->buttonRemovePw, &QAbstractButton::clicked,
+    pwProps, &PasswordPropsWidget::deletePassword
+  );
+
+  updateEditing(pwProps->isEditing());
+  updatePassword(pwProps->getPassword());
 }
 
 GenpassWindow::~GenpassWindow() { }
 
 void
 GenpassWindow::updatePasswordSelection(
-  const QItemSelection &newSelection,
-  const QItemSelection &oldSelection
+  const QItemSelection &newSelection
 ) {
   QModelIndexList selection = newSelection.indexes();
   genpass::Password *selectedPw;
@@ -69,4 +119,33 @@ GenpassWindow::updatePasswordSelection(
   }
   pwProps->setEditing(false);
   pwProps->setPassword(selectedPw);
+}
+
+void
+GenpassWindow::updatePassword(genpass::Password *newPw) {
+  QItemSelectionModel *selector = ui->idList->selectionModel();
+  const QModelIndexList oldSelection = selector->selectedIndexes();
+  if(!newPw) {
+    selector->clearSelection();
+  }
+  else if(oldSelection.empty() ||
+    pwListModel.get(oldSelection[0]) != newPw->id
+  ) {
+    selector->select(pwListModel.find(newPw->id),
+      QItemSelectionModel::ClearAndSelect);
+  }
+
+  ui->buttonEditPw->setEnabled(newPw);
+  ui->buttonRemovePw->setEnabled(newPw);
+}
+
+void
+GenpassWindow::updateEditing(bool editing) {
+  ui->buttonApply->setVisible(editing);
+  ui->buttonCancel->setVisible(editing);
+  if(!editing)
+    ui->buttonApply->setEnabled(false);
+
+  ui->buttonEditPw->setChecked(editing && pwProps->getPassword());
+  ui->buttonAddPw->setChecked(editing && !pwProps->getPassword());
 }
