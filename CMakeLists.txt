@@ -34,6 +34,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/mk/cmake)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 find_package(GenPass REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(cfgpath REQUIRED)
 
 
 ### build configurations

@@ -36,6 +36,7 @@ add_executable(genpass-gui
 
 target_link_libraries(genpass-gui
   PRIVATE
-  Qt6::Widgets
   genpass::genpass
+  Qt6::Widgets
+  cfgpath::cfgpath
 )
