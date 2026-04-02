@@ -24,25 +24,26 @@
 #include <genpass/Password.hpp>      // for Password
 #include <QApplication>              // for QApplication, qApp
 #include <QChar>                     // for QChar
+#include <QClipboard>                // for QClipboard
 #include <QComboBox>                 // for QComboBox
 #include <QFormLayout>               // for QFormLayout
 #include <QLayoutItem>               // for QLayoutItem
 #include <QLineEdit>                 // for QLineEdit
 #include <QList>                     // for QList
 #include <QPlainTextEdit>            // for QPlainTextEdit
+#include <QPushButton>               // for QPushButton
 #include <QSignalBlocker>            // for QSignalBlocker
 #include <QSpinBox>                  // for QSpinBox
 #include <QStringList>               // for QStringList
 #include <QStyleHints>               // for QStyleHints
-#include <QVariant>                  // for operator==, QVariant
+#include <QVariant>                  // for QVariant, operator==
 #include <stdexcept>                 // for runtime_error
 #include <utility>                   // for pair
 #include <vector>                    // for vector
-#include <QClipboard>
 
 #include "AlgorithmHandler.hpp"      // for AlgorithmProps, AlgorithmHandler
+#include "GenpassWindow.hpp"         // for GenpassWindow
 #include "ui_PasswordPropsWidget.h"  // for PasswordPropsWidget
-#include "GenpassWindow.hpp"
 
 PasswordPropsWidget::PasswordPropsWidget(genpass::Genpass& genpass,
   GenpassWindow *parent

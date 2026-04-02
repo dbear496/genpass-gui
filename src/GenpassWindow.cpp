@@ -23,21 +23,26 @@
 // IWYU pragma: no_include <QtCore>
 #include <genpass/Genpass.hpp>      // for Genpass
 #include <genpass/Password.hpp>     // for Password
-#include <genpass/exceptions.hpp>
+#include <genpass/Seed.hpp>         // for Seed
+#include <genpass/exceptions.hpp>   // for WrongKeyException
 #include <QAbstractButton>          // for QAbstractButton
+#include <QApplication>             // for QApplication
+#include <QClipboard>               // for QClipboard
+#include <QInputDialog>             // for QInputDialog
 #include <QItemSelection>           // for QItemSelection
 #include <QItemSelectionModel>      // for QItemSelectionModel
+#include <QLineEdit>                // for QLineEdit
 #include <QListView>                // for QListView
-#include <QModelIndexList>          // for QModelIndexList, QTypeInfo<>::isR...
+#include <QModelIndexList>          // for QModelIndexList
 #include <QPushButton>              // for QPushButton
 #include <QScrollArea>              // for QScrollArea
+#include <QString>                  // for QString
 #include <QWidget>                  // for QWidget
+#include <filesystem>               // for path, operator/
 #include <functional>               // for bind
-#include <string>                   // for operator==, basic_string, string
-#include <QClipboard>
-#include <QInputDialog>
-#include <QLineEdit>
+#include <string>                   // for basic_string, string, operator==
 
+#include "Config.hpp"               // for Config
 #include "PasswordPropsWidget.hpp"  // for PasswordPropsWidget
 #include "ui_GenpassWindow.h"       // for GenpassWindow
 

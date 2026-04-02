@@ -21,17 +21,19 @@
 #ifndef __GENPASSGUI_GENPASSWINDOW_HPP__
 #define __GENPASSGUI_GENPASSWINDOW_HPP__
 
-#include <genpass/Genpass.hpp> // IWYU pragma: keep
+#include <genpass/Genpass.hpp>    // for Genpass
 #include <QMainWindow>            // for QMainWindow
-#include <QObject>                // for Q_OBJECT
+#include <QObject>                // for Q_OBJECT, Q_SIGNALS
+#include <QTimer>                 // for QTimer
 #include <memory>                 // for unique_ptr
-#include <QTimer>
+#include <string>                 // for string, basic_string
 
 #include "PasswordListModel.hpp"  // for PasswordListModel
-#include "Config.hpp"
 
+class Config;
 class PasswordPropsWidget;
 class QItemSelection;
+
 namespace genpass {
 class Password;
 }  // namespace genpass

@@ -22,6 +22,7 @@
 #include <QApplication>            // for QApplication
 #include <string>                  // for basic_string
 
+#include "Config.hpp"              // for Config
 #include "GenpassWindow.hpp"       // for GenpassWindow
 #include "V2AlgorithmHandler.hpp"  // for V2AlgorithmHandler
 
