@@ -32,10 +32,10 @@ namespace genpass {
 class Genpass;
 class Password;
 }  // namespace genpass
-
 namespace Ui {
   class PasswordPropsWidget;
 }
+class GenpassWindow;
 
 class PasswordPropsWidget : public QWidget {
   Q_OBJECT
@@ -51,7 +51,7 @@ class PasswordPropsWidget : public QWidget {
   )
 
 public:
-  PasswordPropsWidget(genpass::Genpass& genpass);
+  PasswordPropsWidget(genpass::Genpass& genpass, GenpassWindow *parent);
   virtual ~PasswordPropsWidget();
 
   genpass::Password *getPassword() const { return currentPw; }
@@ -70,6 +70,7 @@ Q_SIGNALS:
 
 private:
   genpass::Genpass& genpass;
+  GenpassWindow *parent;
   genpass::Password *currentPw = nullptr;
   bool editMode = false;
   bool editPending = false;

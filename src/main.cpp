@@ -2,7 +2,7 @@
  * src/main.cpp
  * This file is part of GenPass-GUI.
  *
- * Copyright (C) 2025      David Bears <dbear4q@gmail.com>
+ * Copyright (C) 2025-2026 David Bears <dbear4q@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -31,12 +31,15 @@ int
 main(int argc, char **argv) {
   QApplication qapp(argc, argv);
 
+  Config config;
+  config.init(argc, argv);
+
   genpass::Genpass genpass;
   addTestPasswords(genpass);
 
   V2AlgorithmHandler v2AlgorithmHandler;
 
-  GenpassWindow mainWindow(genpass);
+  GenpassWindow mainWindow(genpass, config);
 
   mainWindow.show();
 

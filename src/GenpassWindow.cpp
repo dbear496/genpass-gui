@@ -23,6 +23,7 @@
 // IWYU pragma: no_include <QtCore>
 #include <genpass/Genpass.hpp>      // for Genpass
 #include <genpass/Password.hpp>     // for Password
+#include <genpass/exceptions.hpp>
 #include <QAbstractButton>          // for QAbstractButton
 #include <QItemSelection>           // for QItemSelection
 #include <QItemSelectionModel>      // for QItemSelectionModel
@@ -33,15 +34,19 @@
 #include <QWidget>                  // for QWidget
 #include <functional>               // for bind
 #include <string>                   // for operator==, basic_string, string
+#include <QClipboard>
+#include <QInputDialog>
+#include <QLineEdit>
 
 #include "PasswordPropsWidget.hpp"  // for PasswordPropsWidget
 #include "ui_GenpassWindow.h"       // for GenpassWindow
 
-GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
-  QMainWindow(), genpass(genpass), pwListModel(genpass),
+GenpassWindow::GenpassWindow(genpass::Genpass& genpass, Config& config) :
+  QMainWindow(), genpass(genpass), config(config), pwListModel(genpass),
   ui(new Ui::GenpassWindow())
 {
   ui->setupUi(this);
+  pwProps = new PasswordPropsWidget(genpass, this);
 
   ui->idList->setModel(&pwListModel);
   QObject::connect(
@@ -49,11 +54,14 @@ GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
     this, &GenpassWindow::updatePasswordSelection
   );
 
-  pwProps = new PasswordPropsWidget(genpass);
   ui->passwordPropsArea->setWidget(pwProps);
   QObject::connect(
     pwProps, &PasswordPropsWidget::passwordChanged,
     this, &GenpassWindow::updatePassword
+  );
+  QObject::connect(
+    pwProps, &PasswordPropsWidget::passwordChanged,
+    this, [this]() { pwCache.clear(); }
   );
   QObject::connect(
     pwProps, &PasswordPropsWidget::editModeChanged,
@@ -66,6 +74,10 @@ GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
   QObject::connect(
     pwProps, &PasswordPropsWidget::editsCommitted,
     ui->buttonApply, std::bind(&QWidget::setEnabled, ui->buttonApply, false)
+  );
+  QObject::connect(
+    pwProps, &PasswordPropsWidget::editsCommitted,
+    this, [this]() { pwCache.clear(); }
   );
   QObject::connect(
     pwProps, &PasswordPropsWidget::propertyEdited,
@@ -99,8 +111,59 @@ GenpassWindow::GenpassWindow(genpass::Genpass& genpass) :
     pwProps, &PasswordPropsWidget::deletePassword
   );
 
+  pwCache.clearTimer.setInterval(60000);
+  pwCache.clearTimer.setSingleShot(true);
+  QObject::connect(
+    &pwCache.clearTimer, &QTimer::timeout,
+    this, [this]() { pwCache.clear(); }
+  );
+
+  QObject::connect(
+    ui->buttonCopyPw, &QPushButton::clicked,
+    this, [this]() {
+      if(const std::string *pwStr = genPassword(*pwProps->getPassword()))
+        QApplication::clipboard()->setText(pwStr->c_str());
+    }
+  );
+
   updateEditing(pwProps->isEditing());
   updatePassword(pwProps->getPassword());
+}
+
+const std::string *
+GenpassWindow::genPassword(genpass::Password& pw) {
+  if(pw.id != pwCache.id || pwCache.id.empty()) {
+    std::filesystem::path seedFile = config.userDataDir.get() / "seed";
+
+    std::string masterPw;
+    bool ok;
+
+    retry:
+    masterPw = QInputDialog::getText(
+      this,
+      "Unlock Seed",
+      "Password:",
+      QLineEdit::Password,
+      QString(),
+      &ok
+    ).toStdString();
+
+    if(!ok) return nullptr;
+
+    try {
+      genpass::Seed seed = genpass::Seed::fromEncryptedFile(seedFile, masterPw);
+      pwCache.pwStr = pw.generate(seed);
+    } catch(const genpass::WrongKeyException& ex) {
+      goto retry;
+    }
+
+    pwCache.id = pw.id;
+  }
+
+  passwordGenerated(pw, pwCache.pwStr);
+
+  pwCache.clearTimer.start();
+  return &pwCache.pwStr;
 }
 
 GenpassWindow::~GenpassWindow() { }
@@ -137,6 +200,7 @@ GenpassWindow::updatePassword(genpass::Password *newPw) {
 
   ui->buttonEditPw->setEnabled(newPw);
   ui->buttonRemovePw->setEnabled(newPw);
+  ui->buttonCopyPw->setEnabled(newPw);
 }
 
 void

@@ -25,8 +25,10 @@
 #include <QMainWindow>            // for QMainWindow
 #include <QObject>                // for Q_OBJECT
 #include <memory>                 // for unique_ptr
+#include <QTimer>
 
 #include "PasswordListModel.hpp"  // for PasswordListModel
+#include "Config.hpp"
 
 class PasswordPropsWidget;
 class QItemSelection;
@@ -42,8 +44,16 @@ class GenpassWindow : public QMainWindow {
   Q_OBJECT
 
 public:
-  GenpassWindow(genpass::Genpass& genpass);
+  GenpassWindow(genpass::Genpass& genpass, Config& config);
   virtual ~GenpassWindow();
+
+  const std::string *genPassword(genpass::Password& pw);
+  const std::string *genPassword(const std::string& id) {
+    return genPassword(genpass.getPassword(id));
+  }
+
+Q_SIGNALS:
+  void passwordGenerated(genpass::Password& pw, const std::string& pwStr);
 
 private:
   void updatePasswordSelection(const QItemSelection &newSelection);
@@ -52,8 +62,19 @@ private:
 
   genpass::Genpass& genpass;
 
+  Config& config;
+
   PasswordListModel pwListModel;
   PasswordPropsWidget *pwProps;
+
+  struct {
+    std::string id;
+    std::string pwStr;
+
+    void clear() { id.clear(); clearTimer.stop(); }
+    QTimer clearTimer;
+  } pwCache;
+
 
   const std::unique_ptr<Ui::GenpassWindow> ui;
 };

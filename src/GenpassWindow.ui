@@ -32,7 +32,10 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QPushButton" name="buttonCopyPw0">
+           <widget class="QPushButton" name="buttonCopyPw">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Copy to Clipboard</string>
             </property>
@@ -63,6 +66,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="buttonEditPw">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Edit...</string>
             </property>
@@ -73,6 +79,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="buttonRemovePw">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Delete</string>
             </property>

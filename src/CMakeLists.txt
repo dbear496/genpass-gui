@@ -21,6 +21,8 @@
 add_executable(genpass-gui
   AlgorithmHandler.cpp
   AlgorithmHandler.hpp
+  Config.cpp
+  Config.hpp
   GenpassWindow.cpp
   GenpassWindow.hpp
   GenpassWindow.ui

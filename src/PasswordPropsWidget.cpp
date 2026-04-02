@@ -38,12 +38,17 @@
 #include <stdexcept>                 // for runtime_error
 #include <utility>                   // for pair
 #include <vector>                    // for vector
+#include <QClipboard>
 
 #include "AlgorithmHandler.hpp"      // for AlgorithmProps, AlgorithmHandler
 #include "ui_PasswordPropsWidget.h"  // for PasswordPropsWidget
+#include "GenpassWindow.hpp"
 
-PasswordPropsWidget::PasswordPropsWidget(genpass::Genpass& genpass) :
-  QWidget(), genpass(genpass), ui(new Ui::PasswordPropsWidget())
+PasswordPropsWidget::PasswordPropsWidget(genpass::Genpass& genpass,
+  GenpassWindow *parent
+) :
+  QWidget(parent), parent(parent), genpass(genpass),
+  ui(new Ui::PasswordPropsWidget())
 {
   ui->setupUi(this);
 
@@ -84,6 +89,33 @@ PasswordPropsWidget::PasswordPropsWidget(genpass::Genpass& genpass) :
   QObject::connect(
     ui->note, &QPlainTextEdit::textChanged,
     this, &PasswordPropsWidget::propertyEdited
+  );
+
+  QObject::connect(
+    parent, &GenpassWindow::passwordGenerated,
+    ui->password, [this](genpass::Password& pw, const std::string& pwStr) {
+      if(&pw == currentPw)
+        ui->password->setText(pwStr.c_str());
+      else
+        ui->password->clear();
+    }
+  );
+  QObject::connect(
+    ui->buttonShowPw, &QPushButton::clicked,
+    this, [this](bool checked) {
+      if(checked)
+        checked = this->parent->genPassword(*currentPw);
+      ui->buttonShowPw->setChecked(checked);
+      ui->password->setEchoMode(
+        checked ? QLineEdit::Normal : QLineEdit::Password);
+    }
+  );
+  QObject::connect(
+    ui->buttonCopyPw, &QPushButton::clicked,
+    this, [this]() {
+      if(const std::string *pwStr = this->parent->genPassword(*currentPw))
+        QApplication::clipboard()->setText(pwStr->c_str());
+    }
   );
 }
 
@@ -126,8 +158,13 @@ PasswordPropsWidget::refreshPassword() {
   }
   ui->selectAlgo->setEnabled(editMode);
 
-  ui->password->setText(""); // TODO: make sure we don't overwrite valid pw
-  ui->password->setEnabled(editMode);
+  // TODO: don't overwrite valid pw
+  ui->password->setText("");
+  ui->password->setEchoMode(QLineEdit::Password);
+  ui->buttonShowPw->setChecked(false);
+
+  ui->buttonShowPw->setEnabled(currentPw);
+  ui->buttonCopyPw->setEnabled(currentPw);
 
   ui->note->setPlainText(currentPw ? currentPw->note.c_str() : "");
   ui->note->setEnabled(currentPw || editMode);
@@ -144,7 +181,7 @@ PasswordPropsWidget::setEditing(bool edit) {
   if(edit == editMode) return;
   editMode = edit;
 
-  if(!editMode)
+  if(editPending)
     refreshPassword();
 
   ui->id->setReadOnly(!editMode);
@@ -179,6 +216,8 @@ PasswordPropsWidget::commitEdits() {
   currentPw->note = ui->note->toPlainText().toStdString();
 
   algorithmProps->commitEdits(*currentPw);
+
+  editPending = false;
 
   editsCommitted();
 }
